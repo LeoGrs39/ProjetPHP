@@ -1,11 +1,100 @@
-<?php
-$this->layout('template', ['title' => 'TP Mihoyo']);
-?>
-
-<h1>Collection <?= $this->e($gameName) ?></h1>
+<?php $this->layout('template', ['title' => 'Collection Genshin Impact']) ?>
 
 <?php
-var_dump($listPersonnage);
-var_dump($first);
-var_dump($other);
+// Helpers d'affichage
+$stars = function(int $n): string {
+    return str_repeat('★', max(0, min(5, $n)));
+};
+$elClass = function(string $el): string {
+    $map = ['Pyro','Hydro','Cryo','Electro','Anemo','Geo','Dendro'];
+    return in_array($el, $map, true) ? 'el-'.$el : '';
+};
 ?>
+
+<section class="mb-4">
+    <h1 class="h3">Collection <?= $this->e($gameName) ?></h1>
+    <p class="text-muted">Affichage des personnages depuis la base.</p>
+</section>
+
+<section class="mb-5">
+    <?php if (empty($listPersonnage)): ?>
+        <div class="alert alert-secondary">Aucun personnage pour le moment.</div>
+    <?php else: ?>
+        <div class="row g-3">
+            <?php foreach ($listPersonnage as $p): ?>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card shadow-sm h-100">
+                        <!-- Image avec ratio portrait fixe (voir main.css) -->
+                        <div class="ratio ratio-portrait img-frame">
+                            <img
+                                    class="img-cover"
+                                    src="<?= $this->e($p->getUrlImg()) ?>"
+                                    alt="Portrait de <?= $this->e($p->getName()) ?>"
+                                    loading="lazy"
+                                    onerror="this.src='https://via.placeholder.com/600x800?text=No+Image'">
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h2 class="h5 mb-0"><?= $this->e($p->getName()) ?></h2>
+                                <span class="badge text-bg-dark"><?= $stars($p->getRarity()) ?></span>
+                            </div>
+
+                            <div class="mb-2">
+                                <span class="badge badge-element <?= $elClass($p->getElement()) ?>">
+                                    <?= $this->e($p->getElement()) ?>
+                                </span>
+                                <span class="badge text-bg-secondary"><?= $this->e($p->getUnitclass()) ?></span>
+                            </div>
+
+                            <p class="text-muted mb-3">Origine : <?= $this->e($p->getOrigin() ?? '—') ?></p>
+
+                            <div class="mt-auto pt-2 d-flex justify-content-end gap-2 flex-wrap">
+                                <a href="/personnage/edit/<?= $this->e($p->getId()) ?>"
+                                   class="btn btn-sm btn-outline-warning">
+                                    Modifier
+                                </a>
+                                <a href="/personnage/delete/<?= $this->e($p->getId()) ?>"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</section>
+
+<hr class="my-4">
+
+<section>
+    <h2 class="h6">🔧 Debug demandé par la consigne</h2>
+    <div class="row g-3">
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">listPersonnage</div>
+                <div class="card-body">
+                    <pre class="mb-0 small"><?php var_dump($listPersonnage); ?></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">first</div>
+                <div class="card-body">
+                    <pre class="mb-0 small"><?php var_dump($first); ?></pre>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">other</div>
+                <div class="card-body">
+                    <pre class="mb-0 small"><?php var_dump($other); ?></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

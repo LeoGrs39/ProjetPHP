@@ -11,7 +11,6 @@ class Personnage
     private ?string $origin = null;
     private string  $urlImg;
 
-    // ---- Getters / Setters ----
     public function getId(): ?string         { return $this->id; }
     public function setId(?string $id): void { $this->id = $id; }
 
