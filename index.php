@@ -1,7 +1,7 @@
 <?php
 
-use Controllers\MainController;
 use Helpers\Psr4AutoloaderClass;
+use Controllers\Router\Router;
 
 require_once "Helpers/Psr4AutoloaderClass.php";
 
@@ -13,7 +13,8 @@ $loader->addNamespace('\Controllers', '/Controllers');
 $loader->addNamespace('\Models', '/Models');
 $loader->addNamespace('\Config', '/Config');
 
-$templates = new \League\Plates\Engine(__DIR__ . '/Views');
+// Instancie le routeur avec la clé d'action "action"
+$router = new Router('action');
 
-$controller = new MainController($templates);
-$controller->index();
+// Démarre l'aiguillage en lui passant GET/POST
+$router->routing($_GET, $_POST);

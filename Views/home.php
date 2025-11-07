@@ -50,11 +50,11 @@ $elClass = function(string $el): string {
                             <p class="text-muted mb-3">Origine : <?= $this->e($p->getOrigin() ?? '—') ?></p>
 
                             <div class="mt-auto pt-2 d-flex justify-content-end gap-2 flex-wrap">
-                                <a href="/personnage/edit/<?= $this->e($p->getId()) ?>"
+                                <a href="index.php?action=edit-perso&id=<?= $this->e($p->getId()) ?>"
                                    class="btn btn-sm btn-outline-warning">
                                     Modifier
                                 </a>
-                                <a href="/personnage/delete/<?= $this->e($p->getId()) ?>"
+                                <a href="index.php?action=del-perso&id=<?= $this->e($p->getId()) ?>"
                                    class="btn btn-sm btn-outline-danger">
                                     Supprimer
                                 </a>

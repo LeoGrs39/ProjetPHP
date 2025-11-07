@@ -47,3 +47,26 @@ pre {
 
 .navbar-brand { letter-spacing: .5px; }
 footer { background: #fff; }
+
+.navbar {
+    transition: all 0.3s ease-in-out;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #555 !important;
+    transition: color 0.2s, background-color 0.2s;
+    border-radius: 8px;
+    padding: 6px 12px !important;
+}
+
+.nav-link:hover {
+    color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.08);
+}
+
+.nav-link.active {
+    color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.15);
+    font-weight: 600;
+}
