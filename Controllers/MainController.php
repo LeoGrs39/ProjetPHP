@@ -29,11 +29,14 @@ class MainController
 
         $other = $dao->getByID('does-not-exist-123');
 
+        $message = $_GET['message'] ?? null;
+
         echo $this->templates->render('home', [
             'gameName'       => 'Genshin Impact',
             'listPersonnage' => $listPersonnage,
             'first'          => $existing,
             'other'          => $other,
+            'message'        => $message,
         ]);
     }
 }

@@ -5,6 +5,10 @@ use Controllers\MainController;
 use Controllers\PersoController;
 use Controllers\Router\Route\RouteIndex;
 use Controllers\Router\Route\RouteAddPerso;
+use Controllers\Router\Route\RouteAddElement;
+use Controllers\Router\Route\RouteLogs;
+use Controllers\Router\Route\RouteEditPerso;
+use Controllers\Router\Route\RouteDelPerso;
 
 class Router
 {
@@ -27,18 +31,21 @@ class Router
         $templates = new \League\Plates\Engine(dirname(__DIR__, 2) . '/Views');
 
         $this->ctrlList['main']  = new MainController($templates);
-        $this->ctrlList['perso'] = new PersoController($templates); // ⬅️ nouveau
+        $this->ctrlList['perso'] = new PersoController($templates);
     }
 
     protected function createRouteList(): void
     {
-        $this->routeList['index']     = new RouteIndex('index', $this->ctrlList['main']);
-        $this->routeList['add-perso'] = new RouteAddPerso('add-perso', $this->ctrlList['perso']); // ⬅️ nouveau
+        $this->routeList['index']             = new RouteIndex('index', $this->ctrlList['main']);
+        $this->routeList['add-perso']         = new RouteAddPerso('add-perso', $this->ctrlList['perso']);
+        $this->routeList['add-perso-element'] = new RouteAddElement('add-perso-element', $this->ctrlList['perso']);
+        $this->routeList['logs']              = new RouteLogs('logs', $this->ctrlList['main']);
+
+        // 🔹 nouvelles actions sans vue dédiée
+        $this->routeList['edit-perso']        = new RouteEditPerso('edit-perso');
+        $this->routeList['del-perso']         = new RouteDelPerso('del-perso');
     }
 
-    /**
-     * Aiguillage principal
-     */
     public function routing(array $get, array $post): void
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');

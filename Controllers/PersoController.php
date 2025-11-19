@@ -16,4 +16,14 @@ final class PersoController
             'title' => 'Ajouter un personnage'
         ]);
     }
+
+    /**
+     * Page d'ajout d'élément pour un perso : vue "add-element.php"
+     */
+    public function displayAddElement(): void
+    {
+        echo $this->templates->render('add-element', [
+            'title' => 'Ajouter un élément (perso)'
+        ]);
+    }
 }
