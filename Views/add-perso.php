@@ -1,87 +1,102 @@
 <?php
+/** @var string|null $message éventuel message d'erreur/succès (utilisé plus tard dans la partie 4) */
 $this->layout('template', ['title' => 'Ajouter un personnage']);
-
-// Petites listes pour les <select>
-$elements = ['Pyro', 'Hydro', 'Cryo', 'Electro', 'Anemo', 'Geo', 'Dendro'];
-$weapons  = ['Sword', 'Claymore', 'Polearm', 'Bow', 'Catalyst'];
-$origins  = ['Mondstadt', 'Liyue', 'Inazuma', 'Sumeru', 'Fontaine', 'Natlan', 'Snezhnaya'];
 ?>
 
-<h1 class="h3 mb-4">Ajouter un personnage</h1>
+<div class="container my-4">
+    <h1 class="mb-4">Ajouter un personnage</h1>
 
-<section class="row">
-    <div class="col-12 col-lg-8">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <form action="index.php?action=add-perso" method="post">
+    <?php if (!empty($message)): ?>
+        <div class="alert alert-warning">
+            <?= $this->e($message) ?>
+        </div>
+    <?php endif; ?>
 
-                    <!-- Nom -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Nom du personnage</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                        <div class="form-text">Ex : Charlotte, Hu Tao, etc.</div>
-                    </div>
+    <div class="card">
+        <div class="card-body">
+            <!-- IMPORTANT : méthode POST + action vers add-perso -->
+            <form action="index.php?action=add-perso" method="post">
+                <!-- Nom du personnage -->
+                <div class="mb-3">
+                    <label for="perso-nom" class="form-label">Nom du personnage</label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            id="perso-nom"
+                            name="perso-nom"
+                            required
+                    >
+                </div>
 
-                    <!-- URL image -->
-                    <div class="mb-3">
-                        <label for="urlImg" class="form-label">URL de l'image</label>
-                        <input type="url" class="form-control" id="urlImg" name="urlImg" placeholder="https://...">
-                        <div class="form-text">Lien vers une image officielle du personnage.</div>
-                    </div>
+                <!-- Élément (Pyro, Hydro, etc.) -->
+                <div class="mb-3">
+                    <label for="perso-element" class="form-label">Élément</label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            id="perso-element"
+                            name="perso-element"
+                            placeholder="Pyro, Hydro, Cryo..."
+                            required
+                    >
+                </div>
 
-                    <!-- Rareté -->
-                    <div class="mb-3">
-                        <label for="rarity" class="form-label">Rareté</label>
-                        <select class="form-select" id="rarity" name="rarity">
-                            <option value="4">★★★★ (4★)</option>
-                            <option value="5">★★★★★ (5★)</option>
-                        </select>
-                    </div>
+                <!-- Classe / arme / unitclass -->
+                <div class="mb-3">
+                    <label for="perso-unitclass" class="form-label">Classe / Arme</label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            id="perso-unitclass"
+                            name="perso-unitclass"
+                            placeholder="Épée, Arc, Catalyseur..."
+                            required
+                    >
+                </div>
 
-                    <!-- Élément + Arme -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="element" class="form-label">Élément</label>
-                            <select class="form-select" id="element" name="element">
-                                <?php foreach ($elements as $el): ?>
-                                    <option value="<?= $this->e($el) ?>"><?= $this->e($el) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                <!-- Origine (région, ville...) -->
+                <div class="mb-3">
+                    <label for="perso-origin" class="form-label">Origine</label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            id="perso-origin"
+                            name="perso-origin"
+                            placeholder="Mondstadt, Liyue, Inazuma..."
+                    >
+                </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="unitclass" class="form-label">Type d’arme</label>
-                            <select class="form-select" id="unitclass" name="unitclass">
-                                <?php foreach ($weapons as $w): ?>
-                                    <option value="<?= $this->e($w) ?>"><?= $this->e($w) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
+                <!-- Rareté (1 à 5) -->
+                <div class="mb-3">
+                    <label for="perso-rarity" class="form-label">Rareté</label>
+                    <input
+                            type="number"
+                            class="form-control"
+                            id="perso-rarity"
+                            name="perso-rarity"
+                            min="1"
+                            max="5"
+                            required
+                    >
+                </div>
 
-                    <!-- Origine -->
-                    <div class="mb-3">
-                        <label for="origin" class="form-label">Origine</label>
-                        <select class="form-select" id="origin" name="origin">
-                            <option value="">(Autre / non spécifié)</option>
-                            <?php foreach ($origins as $o): ?>
-                                <option value="<?= $this->e($o) ?>"><?= $this->e($o) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                <!-- URL de l'image -->
+                <div class="mb-3">
+                    <label for="perso-url-img" class="form-label">URL de l'image</label>
+                    <input
+                            type="url"
+                            class="form-control"
+                            id="perso-url-img"
+                            name="perso-url-img"
+                            placeholder="https://..."
+                            required
+                    >
+                </div>
 
-                    <!-- Boutons -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="index.php" class="btn btn-outline-secondary">
-                            Annuler
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            Enregistrer le personnage
-                        </button>
-                    </div>
-
-                </form>
-            </div>
+                <button type="submit" class="btn btn-primary">
+                    Créer le personnage
+                </button>
+            </form>
         </div>
     </div>
-</section>
+</div>

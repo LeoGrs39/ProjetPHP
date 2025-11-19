@@ -1,3 +1,3 @@
-<?php $this->layout('template', ['title' => 'Logs']) ?>
+<?php $this->layout('template', ['title' => 'Recherche / Logs']) ?>
 
-<h1>logs</h1>
+<h1>Recherche / Logs</h1>

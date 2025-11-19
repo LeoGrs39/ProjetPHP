@@ -50,11 +50,11 @@ $elClass = function(string $el): string {
                             <p class="text-muted mb-3">Origine : <?= $this->e($p->getOrigin() ?? '—') ?></p>
 
                             <div class="mt-auto pt-2 d-flex justify-content-end gap-2 flex-wrap">
-                                <a href="index.php?action=edit-perso&id=<?= $this->e($p->getId()) ?>"
+                                <a href="/personnage/edit/<?= $this->e($p->getId()) ?>"
                                    class="btn btn-sm btn-outline-warning">
                                     Modifier
                                 </a>
-                                <a href="index.php?action=del-perso&id=<?= $this->e($p->getId()) ?>"
+                                <a href="/personnage/delete/<?= $this->e($p->getId()) ?>"
                                    class="btn btn-sm btn-outline-danger">
                                     Supprimer
                                 </a>
@@ -65,36 +65,4 @@ $elClass = function(string $el): string {
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-</section>
-
-<hr class="my-4">
-
-<section>
-    <h2 class="h6">🔧 Debug demandé par la consigne</h2>
-    <div class="row g-3">
-        <div class="col-12 col-lg-4">
-            <div class="card">
-                <div class="card-header">listPersonnage</div>
-                <div class="card-body">
-                    <pre class="mb-0 small"><?php var_dump($listPersonnage); ?></pre>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-4">
-            <div class="card">
-                <div class="card-header">first</div>
-                <div class="card-body">
-                    <pre class="mb-0 small"><?php var_dump($first); ?></pre>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-4">
-            <div class="card">
-                <div class="card-header">other</div>
-                <div class="card-body">
-                    <pre class="mb-0 small"><?php var_dump($other); ?></pre>
-                </div>
-            </div>
-        </div>
-    </div>
 </section>

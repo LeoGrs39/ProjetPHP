@@ -6,7 +6,6 @@ use Models\PersonnageDAO;
 
 class MainController
 {
-
     private Engine $templates;
 
     public function __construct(Engine $templates)
@@ -29,6 +28,7 @@ class MainController
 
         $other = $dao->getByID('does-not-exist-123');
 
+        // message éventuel (utilisé plus tard pour delete, etc.)
         $message = $_GET['message'] ?? null;
 
         echo $this->templates->render('home', [
@@ -37,6 +37,16 @@ class MainController
             'first'          => $existing,
             'other'          => $other,
             'message'        => $message,
+        ]);
+    }
+
+    /**
+     * Page logs / recherche (Partie 3)
+     */
+    public function displayLogs(): void
+    {
+        echo $this->templates->render('logs', [
+            'title' => 'Logs',
         ]);
     }
 }

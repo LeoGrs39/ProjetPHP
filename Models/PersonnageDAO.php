@@ -21,6 +21,24 @@ class PersonnageDAO extends BasePDODAO
         return $row ? $this->mapRowToEntity($row) : null;
     }
 
+    public function createPersonnage(Personnage $personnage): void
+    {
+        $sql = "INSERT INTO PERSONNAGE (id, name, element, unitclass, origin, rarity, url_img)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        $params = [
+            $personnage->getId(),
+            $personnage->getName(),
+            $personnage->getElement(),
+            $personnage->getUnitclass(),
+            $personnage->getOrigin(),
+            $personnage->getRarity(),
+            $personnage->getUrlImg(),
+        ];
+
+        $this->execRequest($sql, $params);
+    }
+
     private function mapRowToEntity(array $row): Personnage
     {
         $p = new Personnage();
