@@ -14,41 +14,38 @@ class RouteEditPerso extends Route
         $this->controller = $controller;
     }
 
-    /**
-     * Affiche le formulaire pré-rempli pour l'édition.
-     * URL attendue : index.php?action=edit-perso&idPerso=xxxx
-     */
     public function get(array $params = [])
     {
-        try {
-            // Récupération de l'idPerso dans l'URL
-            $idPerso = $this->getParam($params, 'idPerso', false);
-
-            return $this->controller->displayEditPerso($idPerso);
-        } catch (\Exception $e) {
-            // Si le paramètre idPerso est manquant ou vide
-            return $this->controller->displayAddPerso("id not found");
-        }
+        $idPerso = $this->getParam($params, 'idPerso', false);
+        return $this->controller->displayEditPerso($idPerso);
     }
 
     public function post(array $params = [])
     {
         try {
+            $id       = $this->getParam($params, "perso-id", false);
+            $name     = $this->getParam($params, "perso-nom", false);
+            $element  = $this->getParam($params, "perso-element", false);
+            $unitcl   = $this->getParam($params, "perso-unitclass", false);
+            $originRaw= $this->getParam($params, "perso-origin", true);
+            $rarity   = $this->getParam($params, "perso-rarity", false);
+            $urlImg   = $this->getParam($params, "perso-url-img", false);
+
             $data = [
-                "id"        => $this->getParam($params, "perso-id", false),
-                "name"      => $this->getParam($params, "perso-nom", false),
-                "element"   => $this->getParam($params, "perso-element", false),
-                "unitclass" => $this->getParam($params, "perso-unitclass", false),
-                "origin"    => $this->getParam($params, "perso-origin", true),
-                "rarity"    => (int)$this->getParam($params, "perso-rarity", false),
-                "urlImg"    => $this->getParam($params, "perso-url-img", false),
+                "id"        => $id,
+                "name"      => $name,
+                "element"   => intval($element),
+                "unitclass" => intval($unitcl),
+                "origin"    => ($originRaw === '' || $originRaw === null) ? null : intval($originRaw),
+                "rarity"    => (int)$rarity,
+                "urlImg"    => $urlImg,
             ];
 
             return $this->controller->editPersoAndIndex($data);
 
         } catch (\Exception $e) {
-            // En cas d’oubli d’un paramètre
-            return $this->controller->displayAddPerso("Modification impossible : " . $e->getMessage());
+            $idPerso = $params['perso-id'] ?? ($params['idPerso'] ?? '');
+            return $this->controller->displayEditPerso((string)$idPerso, $e->getMessage());
         }
     }
 }

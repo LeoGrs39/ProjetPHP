@@ -22,20 +22,25 @@ class RouteAddPerso extends Route
     public function post(array $params = [])
     {
         try {
+            $name      = $this->getParam($params, "perso-nom", false);
+            $element   = $this->getParam($params, "perso-element", false);
+            $unitclass = $this->getParam($params, "perso-unitclass", false);
+            $originRaw = $this->getParam($params, "perso-origin", true);
+            $rarity    = $this->getParam($params, "perso-rarity", false);
+            $urlImg    = $this->getParam($params, "perso-url-img", false);
+
             $data = [
-                "name"      => $this->getParam($params, "perso-nom", false),
-                "element"   => $this->getParam($params, "perso-element", false),
-                "unitclass" => $this->getParam($params, "perso-unitclass", false),
-                "origin"    => $this->getParam($params, "perso-origin", true),
-                "rarity"    => (int)$this->getParam($params, "perso-rarity", false),
-                // IMPORTANT : pas de snake_case pour l’hydratation -> urlImg
-                "urlImg"    => $this->getParam($params, "perso-url-img", false),
+                "name"      => $name,
+                "element"   => intval($element),
+                "unitclass" => intval($unitclass),
+                "origin"    => ($originRaw === '' || $originRaw === null) ? null : intval($originRaw),
+                "rarity"    => (int)$rarity,
+                "urlImg"    => $urlImg,
             ];
 
             return $this->controller->addPerso($data);
 
         } catch (\Exception $e) {
-
             return $this->controller->displayAddPerso($e->getMessage());
         }
     }

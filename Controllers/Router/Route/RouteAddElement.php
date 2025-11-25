@@ -21,7 +21,6 @@ class RouteAddElement extends Route
 
     public function post(array $params = [])
     {
-        // Rien pour le moment, on réutilise le GET
-        return $this->get($params);
+        return $this->controller->addAttributeFromForm($params);
     }
 }

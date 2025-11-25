@@ -2,8 +2,9 @@
 namespace Controllers;
 
 use League\Plates\Engine;
-use Models\PersonnageDAO;
 use Helpers\Message;
+use Services\PersonnageService;
+use Services\LogService;
 
 class MainController
 {
@@ -16,21 +17,10 @@ class MainController
 
     public function index(): void
     {
-        $dao = new PersonnageDAO();
+        $service        = new PersonnageService();
+        $listPersonnage = $service->getAllPerso();
 
-        $listPersonnage = $dao->getAll();
-
-        $first    = null;
-        $existing = null;
-        if (!empty($listPersonnage)) {
-            $first    = $listPersonnage[0];
-            $existing = $dao->getByID($first->getId());
-        }
-
-        $other = $dao->getByID('does-not-exist-123');
-
-        // message éventuel (objet sérialisé ou string)
-        $raw = $_GET['message'] ?? null;
+        $raw     = $_GET['message'] ?? null;
         $message = null;
 
         if ($raw !== null && $raw !== '') {
@@ -38,24 +28,40 @@ class MainController
             if ($maybe instanceof Message) {
                 $message = $maybe;
             } else {
-                // fallback : juste un texte => message info par défaut
-                $message = new Message((string)$raw);
+                $message = new Message((string) $raw);
             }
         }
 
         echo $this->templates->render('home', [
             'gameName'       => 'Genshin Impact',
             'listPersonnage' => $listPersonnage,
-            'first'          => $existing,
-            'other'          => $other,
+            'personnages'    => $listPersonnage,
             'message'        => $message,
         ]);
     }
 
-    public function displayLogs(): void
+    public function displayLogs(?string $file = null): void
     {
+        $logService = new LogService();
+
+        $logFiles = $logService->listLogFiles();
+        $selectedFile = null;
+        $logContent   = null;
+
+        if ($file !== null && in_array($file, $logFiles, true)) {
+            $selectedFile = $file;
+            $logContent   = $logService->readLogFile($file);
+        } elseif (!empty($logFiles)) {
+            // si aucun fichier demandé, on affiche le plus récent
+            $selectedFile = $logFiles[0];
+            $logContent   = $logService->readLogFile($selectedFile);
+        }
+
         echo $this->templates->render('logs', [
-            'title' => 'Logs',
+            'title'        => 'Logs',
+            'logFiles'     => $logFiles,
+            'selectedFile' => $selectedFile,
+            'logContent'   => $logContent,
         ]);
     }
 }

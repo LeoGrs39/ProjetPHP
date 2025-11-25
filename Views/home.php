@@ -1,19 +1,14 @@
 <?php $this->layout('template', ['title' => 'Collection Genshin Impact']) ?>
 
 <?php
-// Helpers d'affichage
 $stars = function(int $n): string {
     return str_repeat('★', max(0, min(5, $n)));
-};
-$elClass = function(string $el): string {
-    $map = ['Pyro','Hydro','Cryo','Electro','Anemo','Geo','Dendro'];
-    return in_array($el, $map, true) ? 'el-'.$el : 'el-other';
 };
 ?>
 
 <section class="mb-4">
     <h1 class="h3">Collection <?= $this->e($gameName) ?></h1>
-    <p class="text-muted">Affichage des personnages depuis la base.</p>
+    <p class="text-muted">Affichage de votre dream team</p>
 </section>
 
 <section class="mb-5">
@@ -25,7 +20,6 @@ $elClass = function(string $el): string {
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                     <div class="card shadow-sm h-100">
 
-                        <!-- Image -->
                         <div class="ratio ratio-portrait img-frame">
                             <img
                                     class="img-cover"
@@ -36,19 +30,25 @@ $elClass = function(string $el): string {
                         </div>
 
                         <div class="card-body d-flex flex-column">
+
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h2 class="h5 mb-0"><?= $this->e($p->getName()) ?></h2>
                                 <span class="badge text-bg-dark"><?= $stars($p->getRarity()) ?></span>
                             </div>
 
                             <div class="mb-2">
-                                <span class="badge badge-element <?= $elClass($p->getElement()) ?>">
-                                    <?= $this->e($p->getElement()) ?>
+                                <span class="badge text-bg-primary">
+                                    <?= $this->e($p->getElement()?->getName()) ?>
                                 </span>
-                                <span class="badge text-bg-secondary"><?= $this->e($p->getUnitclass()) ?></span>
+
+                                <span class="badge text-bg-secondary">
+                                    <?= $this->e($p->getUnitclass()?->getName()) ?>
+                                </span>
                             </div>
 
-                            <p class="text-muted mb-3">Origine : <?= $this->e($p->getOrigin() ?? '—') ?></p>
+                            <p class="text-muted mb-3">
+                                Origine : <?= $this->e($p->getOrigin()?->getName() ?? '—') ?>
+                            </p>
 
                             <div class="mt-auto pt-2 d-flex justify-content-end gap-2 flex-wrap">
                                 <a href="index.php?action=edit-perso&idPerso=<?= $this->e($p->getId()) ?>"
@@ -62,6 +62,7 @@ $elClass = function(string $el): string {
                                     Supprimer
                                 </a>
                             </div>
+
                         </div>
                     </div>
                 </div>

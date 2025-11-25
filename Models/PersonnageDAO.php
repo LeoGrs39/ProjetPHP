@@ -3,13 +3,14 @@ namespace Models;
 
 class PersonnageDAO extends BasePDODAO
 {
-    /** @return Personnage[] */
+    /**
+     * @return array<int,array<string,mixed>>
+     */
     public function getAll(): array
     {
         $sql  = "SELECT id, name, element, unitclass, origin, rarity, url_img AS urlImg
                  FROM PERSONNAGE";
-        $rows = $this->execRequest($sql)->fetchAll();
-        return array_map([$this, 'mapRowToEntity'], $rows);
+        return $this->execRequest($sql)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function getByID(string $idPersonnage): ?Personnage
@@ -26,12 +27,17 @@ class PersonnageDAO extends BasePDODAO
         $sql = "INSERT INTO PERSONNAGE (id, name, element, unitclass, origin, rarity, url_img)
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+        $elementId   = $personnage->getElement()?->getId();
+        $unitclassId = $personnage->getUnitclass()?->getId();
+        $originObj   = $personnage->getOrigin();
+        $originId    = $originObj ? $originObj->getId() : null;
+
         $params = [
             $personnage->getId(),
             $personnage->getName(),
-            $personnage->getElement(),
-            $personnage->getUnitclass(),
-            $personnage->getOrigin(),
+            $elementId,
+            $unitclassId,
+            $originId,
             $personnage->getRarity(),
             $personnage->getUrlImg(),
         ];
@@ -64,11 +70,16 @@ class PersonnageDAO extends BasePDODAO
             SET name = ?, element = ?, unitclass = ?, origin = ?, rarity = ?, url_img = ?
             WHERE id = ?";
 
+        $elementId   = $perso->getElement()?->getId();
+        $unitclassId = $perso->getUnitclass()?->getId();
+        $originObj   = $perso->getOrigin();
+        $originId    = $originObj ? $originObj->getId() : null;
+
         $params = [
             $perso->getName(),
-            $perso->getElement(),
-            $perso->getUnitclass(),
-            $perso->getOrigin(),
+            $elementId,
+            $unitclassId,
+            $originId,
             $perso->getRarity(),
             $perso->getUrlImg(),
             $perso->getId(),

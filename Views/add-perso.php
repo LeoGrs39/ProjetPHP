@@ -1,12 +1,41 @@
 <?php
 /** @var string|null $message éventuel message d'erreur/succès */
 /** @var \Models\Personnage|null $personnage */
+/** @var \Models\Element[] $elements */
+/** @var \Models\UnitClass[] $unitclasses */
+/** @var \Models\Origin[] $origins */
 
 $isEdit    = isset($personnage);
 $pageTitle = $isEdit ? 'Modifier un personnage' : 'Ajouter un personnage';
 
-// Titre de la page pour le template
 $this->layout('template', ['title' => $pageTitle]);
+
+$selectedElementId   = null;
+$selectedUnitClassId = null;
+$selectedOriginId    = null;
+
+if ($isEdit && $personnage !== null) {
+    $el = $personnage->getElement();
+    if ($el instanceof \Models\Element) {
+        $selectedElementId = $el->getId();
+    } else {
+        $selectedElementId = (int)$el;
+    }
+
+    $uc = $personnage->getUnitclass();
+    if ($uc instanceof \Models\UnitClass) {
+        $selectedUnitClassId = $uc->getId();
+    } else {
+        $selectedUnitClassId = (int)$uc;
+    }
+
+    $or = $personnage->getOrigin();
+    if ($or instanceof \Models\Origin) {
+        $selectedOriginId = $or->getId();
+    } elseif ($or !== null) {
+        $selectedOriginId = (int)$or;
+    }
+}
 ?>
 
 <div class="container my-4">
@@ -20,15 +49,12 @@ $this->layout('template', ['title' => $pageTitle]);
 
     <div class="card">
         <div class="card-body">
-            <!-- action : add-perso en création / edit-perso en édition -->
             <form action="index.php?action=<?= $isEdit ? 'edit-perso' : 'add-perso' ?>" method="post">
 
                 <?php if ($isEdit): ?>
-                    <!-- Champ caché pour l'id du personnage -->
                     <input type="hidden" name="perso-id" value="<?= $this->e($personnage->getId()) ?>">
                 <?php endif; ?>
 
-                <!-- Nom du personnage -->
                 <div class="mb-3">
                     <label for="perso-nom" class="form-label">Nom du personnage</label>
                     <input
@@ -41,48 +67,74 @@ $this->layout('template', ['title' => $pageTitle]);
                     >
                 </div>
 
-                <!-- Élément (Pyro, Hydro, etc.) -->
+                <!-- Élément -->
                 <div class="mb-3">
                     <label for="perso-element" class="form-label">Élément</label>
-                    <input
-                            type="text"
-                            class="form-control"
+                    <select
+                            class="form-select"
                             id="perso-element"
                             name="perso-element"
-                            placeholder="Pyro, Hydro, Cryo..."
-                            value="<?= $isEdit ? $this->e($personnage->getElement()) : '' ?>"
                             required
                     >
+                        <option value="" disabled <?= $selectedElementId === null ? 'selected' : '' ?>>
+                            Choisir un élément
+                        </option>
+                        <?php foreach ($elements as $el): ?>
+                            <option
+                                    value="<?= $this->e($el->getId()) ?>"
+                                    <?= ($selectedElementId !== null && $selectedElementId == $el->getId()) ? 'selected' : '' ?>
+                            >
+                                <?= $this->e($el->getName()) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
-                <!-- Classe / arme / unitclass -->
+                <!-- Classe / unitclass -->
                 <div class="mb-3">
                     <label for="perso-unitclass" class="form-label">Classe / Arme</label>
-                    <input
-                            type="text"
-                            class="form-control"
+                    <select
+                            class="form-select"
                             id="perso-unitclass"
                             name="perso-unitclass"
-                            placeholder="Épée, Arc, Catalyseur..."
-                            value="<?= $isEdit ? $this->e($personnage->getUnitclass()) : '' ?>"
                             required
                     >
+                        <option value="" disabled <?= $selectedUnitClassId === null ? 'selected' : '' ?>>
+                            Choisir une classe
+                        </option>
+                        <?php foreach ($unitclasses as $uc): ?>
+                            <option
+                                    value="<?= $this->e($uc->getId()) ?>"
+                                    <?= ($selectedUnitClassId !== null && $selectedUnitClassId == $uc->getId()) ? 'selected' : '' ?>
+                            >
+                                <?= $this->e($uc->getName()) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
-                <!-- Origine (région, ville...) -->
+                <!-- Origine -->
                 <div class="mb-3">
-                    <label for="perso-origin" class="form-label">Origine</label>
-                    <input
-                            type="text"
-                            class="form-control"
+                    <label for="perso-origin" class="form-label">Origine (optionnelle)</label>
+                    <select
+                            class="form-select"
                             id="perso-origin"
                             name="perso-origin"
-                            placeholder="Mondstadt, Liyue, Inazuma..."
-                            value="<?= $isEdit ? $this->e($personnage->getOrigin() ?? '') : '' ?>"
                     >
+                        <option value="" <?= $selectedOriginId === null ? 'selected' : '' ?>>
+                            Aucune
+                        </option>
+                        <?php foreach ($origins as $or): ?>
+                            <option
+                                    value="<?= $this->e($or->getId()) ?>"
+                                    <?= ($selectedOriginId !== null && $selectedOriginId == $or->getId()) ? 'selected' : '' ?>
+                            >
+                                <?= $this->e($or->getName()) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
-                <!-- Rareté (1 à 5) -->
                 <div class="mb-3">
                     <label for="perso-rarity" class="form-label">Rareté</label>
                     <input
@@ -97,7 +149,6 @@ $this->layout('template', ['title' => $pageTitle]);
                     >
                 </div>
 
-                <!-- URL de l'image -->
                 <div class="mb-3">
                     <label for="perso-url-img" class="form-label">URL de l'image</label>
                     <input

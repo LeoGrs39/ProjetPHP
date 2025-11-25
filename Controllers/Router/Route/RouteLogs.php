@@ -16,12 +16,12 @@ class RouteLogs extends Route
 
     public function get(array $params = [])
     {
-        return $this->controller->displayLogs();
+        $file = $params['file'] ?? null;
+        return $this->controller->displayLogs($file);
     }
 
     public function post(array $params = [])
     {
-        // Logs en lecture seule pour l’instant, même comportement
         return $this->get($params);
     }
 }
