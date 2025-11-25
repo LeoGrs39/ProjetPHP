@@ -73,6 +73,11 @@ $isActive = function(?string $expected) use ($action) {
     <?= $this->section('content') ?>
 </main>
 
+<main id="contenu">
+    <?=$this->insert('message', ['message' => $message ?? null])?>
+    <?=$this->section('content')?>
+</main>
+
 <footer class="border-top py-3 mt-5 bg-white">
     <div class="container small text-muted">© <?= date('Y') ?> — TP Mihoyo</div>
 </footer>

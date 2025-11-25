@@ -2,29 +2,53 @@
 namespace Controllers\Router\Route;
 
 use Controllers\Router\Route;
+use Controllers\PersoController;
 
 class RouteEditPerso extends Route
 {
-    public function __construct(string $name)
+    protected $controller;
+
+    public function __construct(string $name, PersoController $controller)
     {
-        parent::__construct($name, null);
+        parent::__construct($name, $controller);
+        $this->controller = $controller;
     }
 
+    /**
+     * Affiche le formulaire pré-rempli pour l'édition.
+     * URL attendue : index.php?action=edit-perso&idPerso=xxxx
+     */
     public function get(array $params = [])
     {
         try {
-            $id = $this->getParam($params, 'id', false);
+            // Récupération de l'idPerso dans l'URL
+            $idPerso = $this->getParam($params, 'idPerso', false);
 
-            header('Location: index.php?action=add-perso&id=' . urlencode($id));
-            exit;
+            return $this->controller->displayEditPerso($idPerso);
         } catch (\Exception $e) {
-            header('Location: index.php?action=add-perso');
-            exit;
+            // Si le paramètre idPerso est manquant ou vide
+            return $this->controller->displayAddPerso("id not found");
         }
     }
 
     public function post(array $params = [])
     {
-        return $this->get($params);
+        try {
+            $data = [
+                "id"        => $this->getParam($params, "perso-id", false),
+                "name"      => $this->getParam($params, "perso-nom", false),
+                "element"   => $this->getParam($params, "perso-element", false),
+                "unitclass" => $this->getParam($params, "perso-unitclass", false),
+                "origin"    => $this->getParam($params, "perso-origin", true),
+                "rarity"    => (int)$this->getParam($params, "perso-rarity", false),
+                "urlImg"    => $this->getParam($params, "perso-url-img", false),
+            ];
+
+            return $this->controller->editPersoAndIndex($data);
+
+        } catch (\Exception $e) {
+            // En cas d’oubli d’un paramètre
+            return $this->controller->displayAddPerso("Modification impossible : " . $e->getMessage());
+        }
     }
 }

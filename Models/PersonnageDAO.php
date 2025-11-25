@@ -39,10 +39,42 @@ class PersonnageDAO extends BasePDODAO
         $this->execRequest($sql, $params);
     }
 
+    public function deletePerso(?string $idPerso = null): int
+    {
+        if ($idPerso === null) {
+            return 0;
+        }
+
+        $sql  = "DELETE FROM PERSONNAGE WHERE id = ?";
+        $stmt = $this->execRequest($sql, [$idPerso]);
+
+        return $stmt->rowCount();
+    }
+
     private function mapRowToEntity(array $row): Personnage
     {
         $p = new Personnage();
         $p->hydrate($row);
         return $p;
+    }
+
+    public function updatePersonnage(Personnage $perso): int
+    {
+        $sql = "UPDATE PERSONNAGE 
+            SET name = ?, element = ?, unitclass = ?, origin = ?, rarity = ?, url_img = ?
+            WHERE id = ?";
+
+        $params = [
+            $perso->getName(),
+            $perso->getElement(),
+            $perso->getUnitclass(),
+            $perso->getOrigin(),
+            $perso->getRarity(),
+            $perso->getUrlImg(),
+            $perso->getId(),
+        ];
+
+        $stmt = $this->execRequest($sql, $params);
+        return $stmt->rowCount();
     }
 }

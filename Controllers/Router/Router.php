@@ -41,9 +41,9 @@ class Router
         $this->routeList['add-perso-element'] = new RouteAddElement('add-perso-element', $this->ctrlList['perso']);
         $this->routeList['logs']              = new RouteLogs('logs', $this->ctrlList['main']);
 
-        // 🔹 nouvelles actions sans vue dédiée
-        $this->routeList['edit-perso']        = new RouteEditPerso('edit-perso');
-        $this->routeList['del-perso']         = new RouteDelPerso('del-perso');
+        // actions sans vue dédiée
+        $this->routeList['edit-perso']        = new RouteEditPerso('edit-perso', $this->ctrlList['perso']);
+        $this->routeList['del-perso']         = new RouteDelPerso('del-perso', $this->ctrlList['perso']);
     }
 
     public function routing(array $get, array $post): void

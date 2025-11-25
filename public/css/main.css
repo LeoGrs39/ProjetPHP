@@ -70,3 +70,8 @@ footer { background: #fff; }
     background-color: rgba(13, 110, 253, 0.15);
     font-weight: 600;
 }
+
+.badge-element.el-other {
+    background-color: #6c757d; /* gris neutre */
+    color: #fff;
+}

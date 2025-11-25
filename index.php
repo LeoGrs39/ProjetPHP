@@ -13,8 +13,6 @@ $loader->addNamespace('\Controllers', '/Controllers');
 $loader->addNamespace('\Models', '/Models');
 $loader->addNamespace('\Config', '/Config');
 
-// Instancie le routeur avec la clé d'action "action"
 $router = new Router('action');
 
-// Démarre l'aiguillage en lui passant GET/POST
 $router->routing($_GET, $_POST);

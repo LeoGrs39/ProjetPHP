@@ -7,9 +7,16 @@ $stars = function(int $n): string {
 };
 $elClass = function(string $el): string {
     $map = ['Pyro','Hydro','Cryo','Electro','Anemo','Geo','Dendro'];
-    return in_array($el, $map, true) ? 'el-'.$el : '';
+    return in_array($el, $map, true) ? 'el-'.$el : 'el-other';
 };
 ?>
+
+<!-- MESSAGE GLOBAL (succès / erreur) -->
+<?php if (!empty($message)): ?>
+    <div class="alert alert-info">
+        <?= $this->e($message) ?>
+    </div>
+<?php endif; ?>
 
 <section class="mb-4">
     <h1 class="h3">Collection <?= $this->e($gameName) ?></h1>
@@ -24,7 +31,8 @@ $elClass = function(string $el): string {
             <?php foreach ($listPersonnage as $p): ?>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                     <div class="card shadow-sm h-100">
-                        <!-- Image avec ratio portrait fixe (voir main.css) -->
+
+                        <!-- Image -->
                         <div class="ratio ratio-portrait img-frame">
                             <img
                                     class="img-cover"
@@ -50,12 +58,14 @@ $elClass = function(string $el): string {
                             <p class="text-muted mb-3">Origine : <?= $this->e($p->getOrigin() ?? '—') ?></p>
 
                             <div class="mt-auto pt-2 d-flex justify-content-end gap-2 flex-wrap">
-                                <a href="/personnage/edit/<?= $this->e($p->getId()) ?>"
+                                <a href="index.php?action=edit-perso&idPerso=<?= $this->e($p->getId()) ?>"
                                    class="btn btn-sm btn-outline-warning">
                                     Modifier
                                 </a>
-                                <a href="/personnage/delete/<?= $this->e($p->getId()) ?>"
-                                   class="btn btn-sm btn-outline-danger">
+
+                                <a href="index.php?action=del-perso&idPerso=<?= $this->e($p->getId()) ?>"
+                                   class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Supprimer ce personnage ?');">
                                     Supprimer
                                 </a>
                             </div>

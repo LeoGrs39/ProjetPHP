@@ -1,10 +1,16 @@
 <?php
-/** @var string|null $message éventuel message d'erreur/succès (utilisé plus tard dans la partie 4) */
-$this->layout('template', ['title' => 'Ajouter un personnage']);
+/** @var string|null $message éventuel message d'erreur/succès */
+/** @var \Models\Personnage|null $personnage */
+
+$isEdit    = isset($personnage);
+$pageTitle = $isEdit ? 'Modifier un personnage' : 'Ajouter un personnage';
+
+// Titre de la page pour le template
+$this->layout('template', ['title' => $pageTitle]);
 ?>
 
 <div class="container my-4">
-    <h1 class="mb-4">Ajouter un personnage</h1>
+    <h1 class="mb-4"><?= $this->e($pageTitle) ?></h1>
 
     <?php if (!empty($message)): ?>
         <div class="alert alert-warning">
@@ -14,8 +20,14 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
 
     <div class="card">
         <div class="card-body">
-            <!-- IMPORTANT : méthode POST + action vers add-perso -->
-            <form action="index.php?action=add-perso" method="post">
+            <!-- action : add-perso en création / edit-perso en édition -->
+            <form action="index.php?action=<?= $isEdit ? 'edit-perso' : 'add-perso' ?>" method="post">
+
+                <?php if ($isEdit): ?>
+                    <!-- Champ caché pour l'id du personnage -->
+                    <input type="hidden" name="perso-id" value="<?= $this->e($personnage->getId()) ?>">
+                <?php endif; ?>
+
                 <!-- Nom du personnage -->
                 <div class="mb-3">
                     <label for="perso-nom" class="form-label">Nom du personnage</label>
@@ -24,6 +36,7 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
                             class="form-control"
                             id="perso-nom"
                             name="perso-nom"
+                            value="<?= $isEdit ? $this->e($personnage->getName()) : '' ?>"
                             required
                     >
                 </div>
@@ -37,6 +50,7 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
                             id="perso-element"
                             name="perso-element"
                             placeholder="Pyro, Hydro, Cryo..."
+                            value="<?= $isEdit ? $this->e($personnage->getElement()) : '' ?>"
                             required
                     >
                 </div>
@@ -50,6 +64,7 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
                             id="perso-unitclass"
                             name="perso-unitclass"
                             placeholder="Épée, Arc, Catalyseur..."
+                            value="<?= $isEdit ? $this->e($personnage->getUnitclass()) : '' ?>"
                             required
                     >
                 </div>
@@ -63,6 +78,7 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
                             id="perso-origin"
                             name="perso-origin"
                             placeholder="Mondstadt, Liyue, Inazuma..."
+                            value="<?= $isEdit ? $this->e($personnage->getOrigin() ?? '') : '' ?>"
                     >
                 </div>
 
@@ -76,6 +92,7 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
                             name="perso-rarity"
                             min="1"
                             max="5"
+                            value="<?= $isEdit ? $this->e($personnage->getRarity()) : '' ?>"
                             required
                     >
                 </div>
@@ -89,12 +106,13 @@ $this->layout('template', ['title' => 'Ajouter un personnage']);
                             id="perso-url-img"
                             name="perso-url-img"
                             placeholder="https://..."
+                            value="<?= $isEdit ? $this->e($personnage->getUrlImg()) : '' ?>"
                             required
                     >
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    Créer le personnage
+                    <?= $isEdit ? 'Mettre à jour le personnage' : 'Créer le personnage' ?>
                 </button>
             </form>
         </div>

@@ -2,25 +2,29 @@
 namespace Controllers\Router\Route;
 
 use Controllers\Router\Route;
+use Controllers\PersoController;
 
 class RouteDelPerso extends Route
 {
-    public function __construct(string $name)
+    protected $controller;
+
+    public function __construct(string $name, PersoController $controller)
     {
-        parent::__construct($name, null);
+        parent::__construct($name, $controller);
+        $this->controller = $controller;
     }
+
 
     public function get(array $params = [])
     {
         try {
-            $id = $this->getParam($params, 'id', false);
-            $message = "Suppression fictive du personnage $id (partie 3, pas encore en BD).";
-        } catch (\Exception $e) {
-            $message = "Suppression fictive du personnage.";
-        }
+            $idPerso = $this->getParam($params, 'idPerso', false);
 
-        header('Location: index.php?message=' . urlencode($message));
-        exit;
+            return $this->controller->deletePersoAndIndex($idPerso);
+
+        } catch (\Exception $e) {
+            return $this->controller->deletePersoAndIndex(null);
+        }
     }
 
     public function post(array $params = [])
