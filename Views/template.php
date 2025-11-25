@@ -6,17 +6,13 @@
     <title><?= $this->e($title ?? 'TP Mihoyo') ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="public/css/main.css"/>
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body class="bg-light">
 <?php
-
 $action = $_GET['action'] ?? null;
 $isActive = function(?string $expected) use ($action) {
-
     if ($expected === null) {
         return $action === null ? 'active' : '';
     }
@@ -27,7 +23,8 @@ $isActive = function(?string $expected) use ($action) {
     <nav class="navbar navbar-expand-lg navbar-light py-3">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary" href="index.php">
-                <img src="https://img.icons8.com/color/1200/genshin-impact-logo.jpg" alt="Logo" height="28" class="me-2">
+                <img src="https://img.icons8.com/color/1200/genshin-impact-logo.jpg"
+                     alt="Logo" height="28" class="me-2">
                 TP Mihoyo
             </a>
 
@@ -69,13 +66,12 @@ $isActive = function(?string $expected) use ($action) {
     </nav>
 </header>
 
-<main class="container py-4">
-    <?= $this->section('content') ?>
-</main>
+<main id="contenu" class="container py-4">
+    <!-- Affichage global du message (objet ou string) -->
+    <?= $this->insert('message', ['message' => $message ?? null]) ?>
 
-<main id="contenu">
-    <?=$this->insert('message', ['message' => $message ?? null])?>
-    <?=$this->section('content')?>
+    <!-- Contenu spécifique -->
+    <?= $this->section('content') ?>
 </main>
 
 <footer class="border-top py-3 mt-5 bg-white">

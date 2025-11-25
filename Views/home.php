@@ -11,13 +11,6 @@ $elClass = function(string $el): string {
 };
 ?>
 
-<!-- MESSAGE GLOBAL (succès / erreur) -->
-<?php if (!empty($message)): ?>
-    <div class="alert alert-info">
-        <?= $this->e($message) ?>
-    </div>
-<?php endif; ?>
-
 <section class="mb-4">
     <h1 class="h3">Collection <?= $this->e($gameName) ?></h1>
     <p class="text-muted">Affichage des personnages depuis la base.</p>

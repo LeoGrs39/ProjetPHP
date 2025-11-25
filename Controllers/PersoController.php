@@ -4,7 +4,7 @@ namespace Controllers;
 use League\Plates\Engine;
 use Models\Personnage;
 use Models\PersonnageDAO;
-use Helper\Message;
+use Helpers\Message;
 
 final class PersoController
 {
@@ -19,8 +19,7 @@ final class PersoController
     public function displayAddPerso(?string $message = null): void
     {
         echo $this->templates->render('add-perso', [
-            'message' => $message,
-            // pas de personnage -> mode création
+            'message'    => $message,
             'personnage' => null,
         ]);
     }
@@ -28,11 +27,10 @@ final class PersoController
 
     public function displayEditPerso(string $idPerso, ?string $message = null): void
     {
-        $dao      = new PersonnageDAO();
-        $perso    = $dao->getByID($idPerso);
+        $dao   = new PersonnageDAO();
+        $perso = $dao->getByID($idPerso);
 
         if ($perso === null) {
-            // Si l'id ne correspond à aucun perso en BD
             $this->displayAddPerso("Personnage introuvable pour l'id fourni.");
             return;
         }
@@ -43,13 +41,10 @@ final class PersoController
         ]);
     }
 
-
     public function addPerso(array $data): void
     {
-        // Ajout de l'id
         $data['id'] = uniqid('perso_', true);
 
-        // Création de l'objet Personnage
         $perso = new Personnage();
         $perso->hydrate($data);
 
@@ -57,13 +52,20 @@ final class PersoController
 
         try {
             $dao->createPersonnage($perso);
-            $message = 'Le personnage "' . $perso->getName() . '" a bien été créé.';
+            $msgObj = new Message(
+                'Le personnage "' . $perso->getName() . '" a bien été créé.',
+                Message::COLOR_SUCCESS,
+                'Création réussie'
+            );
         } catch (\Throwable $e) {
-            $message = 'Erreur lors de la création du personnage : ' . $e->getMessage();
+            $msgObj = new Message(
+                'Erreur lors de la création du personnage : ' . $e->getMessage(),
+                Message::COLOR_ERROR,
+                'Erreur'
+            );
         }
 
-        // Redirection vers l'index avec le message
-        header('Location: index.php?message=' . urlencode($message));
+        header('Location: index.php?message=' . urlencode(serialize($msgObj)));
         exit;
     }
 
@@ -71,24 +73,41 @@ final class PersoController
     public function deletePersoAndIndex(?string $idPerso = null): void
     {
         $dao = new PersonnageDAO();
+        $msgObj = null;
 
         if ($idPerso === null) {
-            $message = "Impossible de supprimer : identifiant manquant.";
+            $msgObj = new Message(
+                "Impossible de supprimer : identifiant manquant.",
+                Message::COLOR_ERROR,
+                "Erreur de suppression"
+            );
         } else {
             try {
                 $rowCount = $dao->deletePerso($idPerso);
 
                 if ($rowCount > 0) {
-                    $message = "Suppression réussie du personnage.";
+                    $msgObj = new Message(
+                        "Suppression réussie du personnage.",
+                        Message::COLOR_SUCCESS,
+                        "Suppression réussie"
+                    );
                 } else {
-                    $message = "Aucun personnage trouvé pour cet identifiant.";
+                    $msgObj = new Message(
+                        "Aucun personnage trouvé pour cet identifiant.",
+                        Message::COLOR_INFO,
+                        "Information"
+                    );
                 }
             } catch (\Throwable $e) {
-                $message = "Erreur lors de la suppression : " . $e->getMessage();
+                $msgObj = new Message(
+                    "Erreur lors de la suppression : " . $e->getMessage(),
+                    Message::COLOR_ERROR,
+                    "Erreur de suppression"
+                );
             }
         }
 
-        header('Location: index.php?message=' . urlencode($message));
+        header('Location: index.php?message=' . urlencode(serialize($msgObj)));
         exit;
     }
 
@@ -100,10 +119,12 @@ final class PersoController
         ]);
     }
 
+    /**
+     * Update d'un personnage puis retour index avec message.
+     */
     public function editPersoAndIndex(array $data): void
     {
-        $dao = new PersonnageDAO();
-
+        $dao   = new PersonnageDAO();
         $perso = new Personnage();
         $perso->hydrate($data);
 
@@ -111,15 +132,27 @@ final class PersoController
             $rowCount = $dao->updatePersonnage($perso);
 
             if ($rowCount > 0) {
-                $message = "Le personnage a bien été mis à jour.";
+                $msgObj = new Message(
+                    "Le personnage a bien été mis à jour.",
+                    Message::COLOR_SUCCESS,
+                    "Mise à jour réussie"
+                );
             } else {
-                $message = "Aucune modification détectée ou personnage introuvable.";
+                $msgObj = new Message(
+                    "Aucune modification détectée ou personnage introuvable.",
+                    Message::COLOR_INFO,
+                    "Information"
+                );
             }
         } catch (\Throwable $e) {
-            $message = "Erreur lors de l’update : " . $e->getMessage();
+            $msgObj = new Message(
+                "Erreur lors de l’update : " . $e->getMessage(),
+                Message::COLOR_ERROR,
+                "Erreur de mise à jour"
+            );
         }
 
-        header('Location: index.php?message=' . urlencode($message));
+        header('Location: index.php?message=' . urlencode(serialize($msgObj)));
         exit;
     }
 }
