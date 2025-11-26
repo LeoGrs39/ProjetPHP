@@ -1,0 +1,173 @@
+Projet PHP – Genshin Impact DB - Léo Gros
+
+Cette application web permet de gérer une collection de personnages Genshin Impact.
+
+Elle inclut :
+un système d’authentification (toutes les pages sont protégées),
+une gestion des éléments, origines et classes,
+un CRUD des personnages,
+un système de logs,
+un routeur maison.
+
+Installation et configuration
+
+1. Base de données
+Créez une base MySQL nommée projetphp.
+Exécutez le script SQL suivant pour créer toutes les tables et insérer les données initiales :
+
+CREATE DATABASE IF NOT EXISTS projetphp
+    DEFAULT CHARACTER SET utf8
+    DEFAULT COLLATE utf8_general_ci;
+
+USE projetphp;
+
+DROP TABLE IF EXISTS personnage;
+DROP TABLE IF EXISTS element;
+DROP TABLE IF EXISTS origin;
+DROP TABLE IF EXISTS unitclass;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE element (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    url_img VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE unitclass (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    url_img VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE origin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    url_img VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE personnage (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    element INT,
+    unitclass INT,
+    origin INT,
+    rarity INT NOT NULL,
+    url_img VARCHAR(255) NOT NULL,
+    FOREIGN KEY (element) REFERENCES element(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (unitclass) REFERENCES unitclass(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (origin) REFERENCES origin(id) ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE users (
+    id       VARCHAR(191) PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    hash_pwd VARCHAR(255) NOT NULL
+);
+
+-----------------------------------------------------------------------------------------------------
+
+2. Inserts de base
+
+Les tables ELEMENT, ORIGIN, UNITCLASS et PERSONNAGE doivent être remplies pour tester l'application
+Et les utilisateurs doivent être créés.
+Exécutez le script SQL suivant :
+
+
+INSERT INTO element (name, url_img) VALUES
+                                        ('Pyro',   'https://static.icy-veins.com/images/genshin-impact/elements/pyro.webp'),
+                                        ('Hydro',  'https://static.icy-veins.com/images/genshin-impact/elements/hydro.webp'),
+                                        ('Electro','https://static.icy-veins.com/images/genshin-impact/elements/electro.webp'),
+                                        ('Cryo',   'https://genshinimpact.wiki.fextralife.com/file/Genshin-Impact/cryo-element-genshin-impact-wiki-guide.png'),
+                                        ('Anemo',  'https://upload-os-bbs.hoyolab.com/upload/2022/06/17/42243852/0c2245a4f10a25dc00a8b4881bbed129_3633637035211362082.png?x-oss-process=image%2Fresize%2Cs_1000%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70'),
+                                        ('Geo',    'https://static.icy-veins.com/images/genshin-impact/elements/geo.webp'),
+                                        ('Dendro', 'https://static.icy-veins.com/images/genshin-impact/elements/dendro.webp');
+
+INSERT INTO origin (name, url_img) VALUES
+                                       ('Mondstadt', 'public/img/origin/mondstadt.png'),
+                                       ('Liyue',     'public/img/origin/liyue.png'),
+                                       ('Inazuma',   'public/img/origin/inazuma.png'),
+                                       ('Sumeru',    'public/img/origin/sumeru.png'),
+                                       ('Fontaine',  'public/img/origin/fontaine.png'),
+                                       ('Natlan',    'public/img/origin/natlan.png'),
+                                       ('Snezhnaya', 'public/img/origin/snezhnaya.png');
+
+INSERT INTO unitclass (name, url_img) VALUES
+                                          ('Sword',      'public/img/unitclass/sword.png'),
+                                          ('Claymore',   'public/img/unitclass/claymore.png'),
+                                          ('Polearm',    'public/img/unitclass/polearm.png'),
+                                          ('Bow',        'public/img/unitclass/bow.png'),
+                                          ('Catalyst',   'public/img/unitclass/catalyst.png');
+
+INSERT INTO origin (id, name, url_img) VALUES
+    (8, 'Nod-Krai', 'public/img/origin/nod-krai.png');
+
+INSERT INTO personnage (id, name, element, unitclass, origin, rarity, url_img) VALUES
+                                                                                   ('perso_dori',      'Dori',      3, 2, 4, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/d/d9/Dori_Card.png'),
+                                                                                   ('perso_emilie',    'Emilie',    7, 3, 5, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/e/ec/Emilie_Card.png'),
+                                                                                   ('perso_escoffier', 'Escoffier', 4, 3, 5, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/7/74/Escoffier_Card.png'),
+                                                                                   ('perso_eula',      'Eula',      4, 2, 1, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/0/0e/Eula_Card.png'),
+                                                                                   ('perso_faruzan',   'Faruzan',   5, 4, 4, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/7/77/Faruzan_Card.png'),
+                                                                                   ('perso_fischl',    'Fischl',    3, 4, 1, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/5/54/Fischl_Card.png'),
+                                                                                   ('perso_flins',     'Flins',     3, 3, 8, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/6/64/Flins_Card.png'),
+                                                                                   ('perso_freminet',  'Freminet',  4, 2, 5, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/3/3c/Freminet_Card.png'),
+                                                                                   ('perso_furina',    'Furina',    2, 1, 5, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/2/27/Furina_Card.png'),
+                                                                                   ('perso_gaming',    'Gaming',    1, 2, 2, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/6/6a/Gaming_Card.png'),
+                                                                                   ('perso_ganyu',     'Ganyu',     4, 4, 2, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/2/24/Ganyu_Card.png'),
+                                                                                   ('perso_gorou',     'Gorou',     6, 4, 3, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/0/0b/Gorou_Card.png'),
+                                                                                   ('perso_hutao',     'Hu Tao',    1, 3, 2, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/8/88/Hu_Tao_Card.png'),
+                                                                                   ('perso_iansan',    'Iansan',    3, 3, 6, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/8/86/Iansan_Card.png'),
+                                                                                   ('perso_ifa',       'Ifa',       5, 5, 6, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/e/e8/Ifa_Card.png'),
+                                                                                   ('perso_ineffa',    'Ineffa',    3, 3, 8, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/3/39/Ineffa_Card.png'),
+                                                                                   ('perso_jean',      'Jean',      5, 1, 1, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/a/a8/Jean_Card.png'),
+                                                                                   ('perso_kachina',   'Kachina',   6, 3, 6, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/f/f8/Kachina_Card.png');
+
+INSERT INTO personnage (id, name, element, unitclass, origin, rarity, url_img) VALUES
+                                                                                   ('perso_kazuha',  'Kaedehara Kazuha', 5, 1, 3, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/8/81/Kaedehara_Kazuha_Card.png'),
+                                                                                   ('perso_kaeya',   'Kaeya',            4, 1, 1, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/2/20/Kaeya_Card.png'),
+                                                                                   ('perso_ayaka',   'Kamisato Ayaka',   4, 1, 3, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/0/01/Kamisato_Ayaka_Card.png'),
+                                                                                   ('perso_ayato',   'Kamisato Ayato',   2, 1, 3, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/1/12/Kamisato_Ayato_Card.png'),
+                                                                                   ('perso_kaveh',   'Kaveh',            7, 2, 4, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/3/30/Kaveh_Card.png'),
+                                                                                   ('perso_keqing',  'Keqing',           3, 1, 2, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/6/64/Keqing_Card.png'),
+                                                                                   ('perso_kinich',  'Kinich',           7, 2, 6, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/9/9a/Kinich_Card.png'),
+                                                                                   ('perso_kirara',  'Kirara',           7, 1, 3, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/9/90/Kirara_Card.png'),
+                                                                                   ('perso_klee',    'Klee',             1, 5, 1, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/d/d2/Klee_Card.png'),
+                                                                                   ('perso_sara',    'Kujou Sara',       3, 4, 3, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/c/c8/Kujou_Sara_Card.png'),
+                                                                                   ('perso_kuki',    'Kuki Shinobu',     3, 1, 3, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/0/00/Kuki_Shinobu_Card.png'),
+                                                                                   ('perso_lanyan',  'Lan Yan',          5, 5, 2, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/d/d7/Lan_Yan_Card.png'),
+                                                                                   ('perso_lauma',   'Lauma',            7, 5, 8, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/d/d9/Lauma_Card.png'),
+                                                                                   ('perso_layla',   'Layla',            4, 1, 4, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/8/82/Layla_Card.png'),
+                                                                                   ('perso_lisa',    'Lisa',             3, 5, 1, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/a/a8/Lisa_Card.png'),
+                                                                                   ('perso_lynette', 'Lynette',          5, 1, 5, 4, 'https://static.wikia.nocookie.net/gensin-impact/images/e/e4/Lynette_Card.png'),
+                                                                                   ('perso_lyney',   'Lyney',            1, 4, 5, 5, 'https://static.wikia.nocookie.net/gensin-impact/images/8/86/Lyney_Card.png');
+
+INSERT INTO users (id, username, hash_pwd) VALUES
+('usr_admin_01', 'admin', '$2y$10$tOY9q3oGEeil7uvCC94Ma.UqpDmuVc0UfUdKbKmMWYTq/zplW21em'),
+('usr_test_01',  'test',  '$2y$10$9NkCoEFPRZxWwTppInGoi.M36TrmgQfhdCMRMhGmJdN0R4xi7F/qy');
+
+-------------------------------------------------------------------------------------------------
+
+Les Identifiants et les mdp respectifs sont :
+(Utilisateur / Mot de passe)
+admin / admin
+test / test
+
+------------------------------------------------------------------------------------------------
+
+Configuration
+
+Modifiez le fichier Config/dev.ini pour indiquer vos accès MySQL :
+
+dsn = "mysql:host=localhost;dbname=projetphp;charset=utf8"
+user = "root"
+pass = ""
+
+-------------------------------------------------------------------------------------------------
+
+Lancer le projet
+
+* Lancez le serveur PHP ou utilisez un live server.
+* Accédez à `index.php` depuis votre navigateur.
+
+
+
+
