@@ -17,9 +17,15 @@ $stars = function(int $n): string {
     <?php else: ?>
         <div class="row g-3">
             <?php foreach ($listPersonnage as $p): ?>
+                <?php
+                $element   = $p->getElement();
+                $origin    = $p->getOrigin();
+                $unitclass = $p->getUnitclass();
+                ?>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                     <div class="card shadow-sm h-100">
 
+                        <!-- Portrait du personnage -->
                         <div class="ratio ratio-portrait img-frame">
                             <img
                                     class="img-cover"
@@ -31,25 +37,46 @@ $stars = function(int $n): string {
 
                         <div class="card-body d-flex flex-column">
 
+                            <!-- Nom + rareté + icône élément -->
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h2 class="h5 mb-0"><?= $this->e($p->getName()) ?></h2>
-                                <span class="badge text-bg-dark"><?= $stars($p->getRarity()) ?></span>
+                                <div class="me-2">
+                                    <h2 class="h5 mb-1"><?= $this->e($p->getName()) ?></h2>
+                                    <span class="badge text-bg-dark"><?= $stars($p->getRarity()) ?></span>
+                                </div>
+
+                                <?php if ($element && $element->getUrlImg()): ?>
+                                    <img
+                                            src="<?= $this->e($element->getUrlImg()) ?>"
+                                            alt="Élément <?= $this->e($element->getName()) ?>"
+                                            class="rounded-circle border"
+                                            style="width: 40px; height: 40px; object-fit: cover;"
+                                            loading="lazy"
+                                            onerror="this.src='https://via.placeholder.com/40?text=?'">
+                                <?php endif; ?>
                             </div>
 
+                            <!-- Badges texte (élément / classe) -->
                             <div class="mb-2">
-                                <span class="badge text-bg-primary">
-                                    <?= $this->e($p->getElement()?->getName()) ?>
-                                </span>
+                                <?php if ($element): ?>
+                                    <span class="badge text-bg-primary">
+                                        <?= $this->e($element->getName()) ?>
+                                    </span>
+                                <?php endif; ?>
 
-                                <span class="badge text-bg-secondary">
-                                    <?= $this->e($p->getUnitclass()?->getName()) ?>
-                                </span>
+                                <?php if ($unitclass): ?>
+                                    <span class="badge text-bg-secondary">
+                                        <?= $this->e($unitclass->getName()) ?>
+                                    </span>
+                                <?php endif; ?>
                             </div>
 
+                            <!-- Origine -->
                             <p class="text-muted mb-3">
-                                Origine : <?= $this->e($p->getOrigin()?->getName() ?? '—') ?>
+                                Origine :
+                                <?= $origin ? $this->e($origin->getName()) : '—' ?>
                             </p>
 
+                            <!-- Boutons d’actions -->
                             <div class="mt-auto pt-2 d-flex justify-content-end gap-2 flex-wrap">
                                 <a href="index.php?action=edit-perso&idPerso=<?= $this->e($p->getId()) ?>"
                                    class="btn btn-sm btn-outline-warning">

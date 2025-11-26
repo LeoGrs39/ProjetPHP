@@ -6,15 +6,32 @@ use Helpers\Message;
 use Services\PersonnageService;
 use Services\LogService;
 
+/**
+ * Class MainController
+ * * Contrôleur principal gérant les pages générales de l'application
+ * (Accueil, Visualisation des logs, etc.).
+ */
 class MainController
 {
     private Engine $templates;
 
+    /**
+     * Constructeur du contrôleur.
+     *
+     * @param Engine $templates Moteur de template (Plates)
+     */
     public function __construct(Engine $templates)
     {
         $this->templates = $templates;
     }
 
+    /**
+     * Affiche la page d'accueil.
+     * * Récupère la liste des personnages via le service dédié et gère
+     * l'affichage des messages flash passés en GET.
+     *
+     * @return void
+     */
     public function index(): void
     {
         $service        = new PersonnageService();
@@ -40,6 +57,15 @@ class MainController
         ]);
     }
 
+    /**
+     * Affiche l'interface de visualisation des fichiers de logs.
+     *
+     * Si un fichier spécifique est demandé, il tente de l'afficher.
+     * Sinon, il affiche par défaut le fichier le plus récent.
+     *
+     * @param string|null $file Nom du fichier de log à afficher (optionnel)
+     * @return void
+     */
     public function displayLogs(?string $file = null): void
     {
         $logService = new LogService();

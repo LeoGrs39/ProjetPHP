@@ -1,5 +1,5 @@
 <?php
-
+//die(password_hash('admin', PASSWORD_DEFAULT));
 use Helpers\Psr4AutoloaderClass;
 use Controllers\Router\Router;
 
@@ -13,8 +13,12 @@ $loader->addNamespace('\Controllers', 'Controllers');
 $loader->addNamespace('\Models', 'Models');
 $loader->addNamespace('\Config', 'Config');
 $loader->addNamespace('\Services', 'Services');
+$loader->addNamespace('\Exceptions', '/Exceptions');
 
 
 $router = new Router('action');
 
 $router->routing($_GET, $_POST);
+
+
+

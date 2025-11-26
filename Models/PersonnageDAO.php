@@ -1,10 +1,17 @@
 <?php
 namespace Models;
 
+/**
+ * Class PersonnageDAO
+ * * DAO responsable de la gestion de la table PERSONNAGE en base de données.
+ * Permet de récupérer, créer, modifier et supprimer des personnages.
+ */
 class PersonnageDAO extends BasePDODAO
 {
     /**
-     * @return array<int,array<string,mixed>>
+     * Récupère la liste brute de tous les personnages.
+     *
+     * @return array<int,array<string,mixed>> Tableau de tableaux associatifs représentant les lignes de la table.
      */
     public function getAll(): array
     {
@@ -13,6 +20,12 @@ class PersonnageDAO extends BasePDODAO
         return $this->execRequest($sql)->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Recherche un personnage par son identifiant unique.
+     *
+     * @param string $idPersonnage L'identifiant du personnage
+     * @return Personnage|null L'objet Personnage hydraté ou null si introuvable
+     */
     public function getByID(string $idPersonnage): ?Personnage
     {
         $sql  = "SELECT id, name, element, unitclass, origin, rarity, url_img AS urlImg
@@ -22,6 +35,13 @@ class PersonnageDAO extends BasePDODAO
         return $row ? $this->mapRowToEntity($row) : null;
     }
 
+    /**
+     * Insère un nouveau personnage en base de données.
+     * * Extrait les identifiants des objets liés (Element, UnitClass, Origin) pour gérer les clés étrangères.
+     *
+     * @param Personnage $personnage L'objet personnage à persister
+     * @return void
+     */
     public function createPersonnage(Personnage $personnage): void
     {
         $sql = "INSERT INTO PERSONNAGE (id, name, element, unitclass, origin, rarity, url_img)
@@ -45,6 +65,12 @@ class PersonnageDAO extends BasePDODAO
         $this->execRequest($sql, $params);
     }
 
+    /**
+     * Supprime un personnage de la base de données via son ID.
+     *
+     * @param string|null $idPerso L'identifiant du personnage (ne fait rien si null)
+     * @return int Le nombre de lignes supprimées (devrait être 1 si succès, 0 sinon)
+     */
     public function deletePerso(?string $idPerso = null): int
     {
         if ($idPerso === null) {
@@ -57,6 +83,12 @@ class PersonnageDAO extends BasePDODAO
         return $stmt->rowCount();
     }
 
+    /**
+     * Convertit une ligne de résultat SQL (tableau associatif) en objet Personnage.
+     *
+     * @param array $row Données brutes issues de la BDD
+     * @return Personnage L'objet hydraté
+     */
     private function mapRowToEntity(array $row): Personnage
     {
         $p = new Personnage();
@@ -64,6 +96,12 @@ class PersonnageDAO extends BasePDODAO
         return $p;
     }
 
+    /**
+     * Met à jour les informations d'un personnage existant.
+     *
+     * @param Personnage $perso L'objet contenant les nouvelles données
+     * @return int Le nombre de lignes affectées par la mise à jour
+     */
     public function updatePersonnage(Personnage $perso): int
     {
         $sql = "UPDATE PERSONNAGE 

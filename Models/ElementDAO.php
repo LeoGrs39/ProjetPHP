@@ -6,8 +6,19 @@ use Models\BasePDODAO;
 use Models\Element;
 use PDO;
 
+/**
+ * Class ElementDAO
+ * * Gère les opérations CRUD pour la table 'element'.
+ * Permet de manipuler les attributs élémentaires (Pyro, Hydro, Anemo, etc.).
+ */
 class ElementDAO extends BasePDODAO
 {
+    /**
+     * Enregistre un nouvel élément en base de données.
+     *
+     * @param Element $element L'objet élément à insérer (avec nom et image)
+     * @return bool Vrai si la requête a réussi (statement retourné), Faux sinon
+     */
     public function create(Element $element): bool
     {
         $sql = "INSERT INTO element (name, url_img) VALUES (?, ?)";
@@ -19,6 +30,12 @@ class ElementDAO extends BasePDODAO
         return $stmt !== false;
     }
 
+    /**
+     * Récupère la liste complète des éléments existants.
+     * * Instancie et hydrate des objets Element pour chaque ligne trouvée.
+     *
+     * @return Element[] Tableau d'objets Element
+     */
     public function getAll(): array
     {
         $sql = "SELECT * FROM element";
@@ -34,6 +51,12 @@ class ElementDAO extends BasePDODAO
         return $elements;
     }
 
+    /**
+     * Cherche un élément spécifique par son identifiant numérique.
+     *
+     * @param int $id Identifiant unique de l'élément
+     * @return Element|null L'objet Element hydraté ou null si l'ID n'existe pas
+     */
     public function getById(int $id): ?Element
     {
         $sql = "SELECT * FROM element WHERE id = ?";

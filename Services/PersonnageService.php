@@ -7,6 +7,7 @@ use Models\PersonnageDAO;
 use Models\ElementDAO;
 use Models\OriginDAO;
 use Models\UnitClassDAO;
+use Exceptions\PersonnageNotFoundException;
 
 class PersonnageService
 {
@@ -60,6 +61,25 @@ class PersonnageService
         return $result;
     }
 
+    /**
+     * Crée un personnage à partir des données d'un formulaire.
+     *
+     * @param array{
+     *   name?: string,
+     *   "perso-nom"?: string,
+     *   element?: int,
+     *   "perso-element"?: int,
+     *   unitclass?: int,
+     *   "perso-unitclass"?: int,
+     *   origin?: int|null,
+     *   "perso-origin"?: int|null,
+     *   rarity?: int,
+     *   "perso-rarity"?: int,
+     *   urlImg?: string,
+     *   url_img?: string,
+     *   "perso-url-img"?: string
+     * } $data
+     */
     public function createFromForm(array $data): Personnage
     {
         $id = uniqid('perso_', true);
@@ -97,13 +117,23 @@ class PersonnageService
     }
 
     /**
-     * Update un personnage à partir du formulaire (Partie 5 – 2.3).
+     * Met à jour un personnage à partir des données d'un formulaire.
+     *
+     * @param array<string,mixed> $data
+     *
+     * @throws PersonnageNotFoundException si l'ID est manquant ou introuvable.
      */
     public function updateFromForm(array $data): Personnage
     {
         $id = $data['id'] ?? $data['perso-id'] ?? null;
         if ($id === null || $id === '') {
-            throw new \RuntimeException("Identifiant du personnage manquant pour la mise à jour.");
+            throw new PersonnageNotFoundException("Identifiant du personnage manquant pour la mise à jour.");
+        }
+
+        // Vérification que le personnage existe bien avant mise à jour
+        $existing = $this->persoDao->getByID($id);
+        if ($existing === null) {
+            throw new PersonnageNotFoundException("Personnage introuvable pour l'ID $id.");
         }
 
         $name   = $data['name']        ?? $data['perso-nom']       ?? '';

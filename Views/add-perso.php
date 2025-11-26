@@ -115,7 +115,7 @@ if ($isEdit && $personnage !== null) {
 
                 <!-- Origine -->
                 <div class="mb-3">
-                    <label for="perso-origin" class="form-label">Origine (optionnelle)</label>
+                    <label for="perso-origin" class="form-label">Origine</label>
                     <select
                             class="form-select"
                             id="perso-origin"

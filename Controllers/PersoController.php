@@ -13,18 +13,37 @@ use Models\UnitClassDAO;
 use Helpers\Message;
 use Services\PersonnageService;
 use Services\LogService;
+use Exceptions\PersonnageNotFoundException;
+use Exceptions\AttributeCreationException;
 
+/**
+ * Class PersoController
+ * * Contrôleur final gérant le CRUD des personnages (Ajout, Édition, Suppression)
+ * ainsi que la création des attributs liés (Éléments, Origines, Classes).
+ */
 final class PersoController
 {
     private Engine $templates;
     private LogService $logger;
 
+    /**
+     * Constructeur du contrôleur.
+     *
+     * @param Engine $templates Moteur de template (Plates)
+     */
     public function __construct(Engine $templates)
     {
         $this->templates = $templates;
         $this->logger    = new LogService();
     }
 
+    /**
+     * Affiche le formulaire d'ajout d'un personnage.
+     * * Charge les listes (éléments, origines, classes) pour alimenter les listes déroulantes.
+     *
+     * @param string|null $message Message optionnel à afficher (ex: erreur ou info)
+     * @return void
+     */
     public function displayAddPerso(?string $message = null): void
     {
         $elementDao   = new ElementDAO();
@@ -44,6 +63,14 @@ final class PersoController
         ]);
     }
 
+    /**
+     * Affiche le formulaire d'édition pour un personnage existant.
+     * * Si l'ID ne correspond à rien, redirige vers le formulaire d'ajout avec une erreur.
+     *
+     * @param string $idPerso Identifiant unique du personnage
+     * @param string|null $message Message optionnel
+     * @return void
+     */
     public function displayEditPerso(string $idPerso, ?string $message = null): void
     {
         $dao   = new PersonnageDAO();
@@ -72,14 +99,18 @@ final class PersoController
     }
 
     /**
+     * Traite la soumission du formulaire de création de personnage.
+     * * Valide les données via le Service, loggue le résultat et redirige vers l'index.
+     *
      * @param array{
-     *   name: string,
-     *   element: int,
-     *   unitclass: int,
-     *   origin?: int|null,
-     *   rarity: int,
-     *   urlImg: string
-     * } $data
+     * name: string,
+     * element: int,
+     * unitclass: int,
+     * origin?: int|null,
+     * rarity: int,
+     * urlImg: string
+     * } $data Données issues du formulaire ($_POST)
+     * @return void
      */
     public function addPerso(array $data): void
     {
@@ -117,6 +148,12 @@ final class PersoController
         exit;
     }
 
+    /**
+     * Supprime un personnage et redirige vers la page d'accueil.
+     *
+     * @param string|null $idPerso Identifiant du personnage à supprimer
+     * @return void
+     */
     public function deletePersoAndIndex(?string $idPerso = null): void
     {
         $dao = new PersonnageDAO();
@@ -182,6 +219,12 @@ final class PersoController
         exit;
     }
 
+    /**
+     * Traite la soumission du formulaire de modification de personnage.
+     *
+     * @param array $data Données issues du formulaire ($_POST) contenant l'ID du personnage
+     * @return void
+     */
     public function editPersoAndIndex(array $data): void
     {
         $service = new PersonnageService();
@@ -200,7 +243,23 @@ final class PersoController
                 Message::COLOR_SUCCESS,
                 "Mise à jour réussie"
             );
+
+        } catch (PersonnageNotFoundException $e) {
+
+            $this->logger->log(
+                'UPDATE_PERSO',
+                'Personnage introuvable : '.$e->getMessage(),
+                false
+            );
+
+            $msgObj = new Message(
+                "Personnage introuvable : " . $e->getMessage(),
+                Message::COLOR_ERROR,
+                "Personnage introuvable"
+            );
+
         } catch (\Throwable $e) {
+
             $this->logger->log(
                 'UPDATE_PERSO',
                 'Erreur lors de la mise à jour du personnage : '.$e->getMessage(),
@@ -218,6 +277,12 @@ final class PersoController
         exit;
     }
 
+    /**
+     * Affiche le formulaire d'ajout d'un attribut (Element, Origine ou Classe).
+     *
+     * @param string|null $message Message optionnel
+     * @return void
+     */
     public function displayAddElement(?string $message = null): void
     {
         echo $this->templates->render('add-element', [
@@ -226,54 +291,47 @@ final class PersoController
         ]);
     }
 
+    /**
+     * Traite l'ajout d'un attribut (Element, Origin, UnitClass) depuis le formulaire.
+     * * Instancie le bon modèle et le bon DAO en fonction du type reçu.
+     *
+     * @param array $data Données du formulaire (type, name, url_img)
+     * @return void
+     */
     public function addAttributeFromForm(array $data): void
     {
         $type   = $data['type']    ?? null;
         $name   = isset($data['name']) ? trim($data['name']) : '';
         $urlImg = isset($data['url_img']) ? trim($data['url_img']) : '';
 
-        if (!$type || $name === '' || $urlImg === '') {
-            $this->logger->log(
-                'CREATE_ATTR',
-                "Échec création attribut (champ manquant)",
-                false
-            );
-
-            $this->displayAddElement("Tous les champs sont obligatoires.");
-            return;
-        }
-
-        switch ($type) {
-            case 'element':
-                $attr = new Element();
-                $dao  = new ElementDAO();
-                break;
-
-            case 'origin':
-                $attr = new Origin();
-                $dao  = new OriginDAO();
-                break;
-
-            case 'unitclass':
-                $attr = new UnitClass();
-                $dao  = new UnitClassDAO();
-                break;
-
-            default:
-                $this->logger->log(
-                    'CREATE_ATTR',
-                    "Type d'attribut inconnu : $type",
-                    false
-                );
-
-                $this->displayAddElement("Type d'attribut inconnu.");
-                return;
-        }
-
-        $attr->setName($name);
-        $attr->setUrlImg($urlImg);
-
         try {
+            if (!$type || $name === '' || $urlImg === '') {
+                throw new AttributeCreationException("Tous les champs sont obligatoires.");
+            }
+
+            switch ($type) {
+                case 'element':
+                    $attr = new Element();
+                    $dao  = new ElementDAO();
+                    break;
+
+                case 'origin':
+                    $attr = new Origin();
+                    $dao  = new OriginDAO();
+                    break;
+
+                case 'unitclass':
+                    $attr = new UnitClass();
+                    $dao  = new UnitClassDAO();
+                    break;
+
+                default:
+                    throw new AttributeCreationException("Type d'attribut inconnu : $type");
+            }
+
+            $attr->setName($name);
+            $attr->setUrlImg($urlImg);
+
             $ok = $dao->create($attr);
 
             if ($ok) {
@@ -288,23 +346,33 @@ final class PersoController
                     Message::COLOR_SUCCESS,
                     "Création réussie"
                 );
-            } else {
-                $this->logger->log(
-                    'CREATE_ATTR',
-                    "Aucune ligne modifiée lors de la création d'attribut '$type' ($name)",
-                    false
-                );
 
-                $msgObj = new Message(
-                    "Impossible de créer l'attribut (aucune ligne modifiée).",
-                    Message::COLOR_ERROR,
-                    "Erreur"
+                header('Location: index.php?message=' . urlencode(serialize($msgObj)));
+                exit;
+
+            } else {
+                throw new AttributeCreationException(
+                    "Impossible de créer l'attribut (aucune ligne modifiée)."
                 );
             }
-        } catch (\Throwable $e) {
+
+        } catch (AttributeCreationException $e) {
+
             $this->logger->log(
                 'CREATE_ATTR',
-                "Erreur lors de la création d'attribut '$type' ($name) : ".$e->getMessage(),
+                "Erreur métier création attribut '$type' ($name) : ".$e->getMessage(),
+                false
+            );
+
+            // On reste sur la page du formulaire avec le message d'erreur
+            $this->displayAddElement($e->getMessage());
+            return;
+
+        } catch (\Throwable $e) {
+
+            $this->logger->log(
+                'CREATE_ATTR',
+                "Erreur technique lors de la création d'attribut '$type' ($name) : ".$e->getMessage(),
                 false
             );
 
@@ -313,9 +381,9 @@ final class PersoController
                 Message::COLOR_ERROR,
                 "Erreur"
             );
-        }
 
-        header('Location: index.php?message=' . urlencode(serialize($msgObj)));
-        exit;
+            header('Location: index.php?message=' . urlencode(serialize($msgObj)));
+            exit;
+        }
     }
 }
