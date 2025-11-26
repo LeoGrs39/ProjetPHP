@@ -65,13 +65,18 @@
 <body>
 
 <?php
+use Services\AuthService;
+
 $action = $_GET['action'] ?? null;
+
 $isActive = function(?string $expected) use ($action) {
     if ($expected === null) {
         return $action === null ? 'active' : '';
     }
     return $action === $expected ? 'active' : '';
 };
+
+$isLogged = AuthService::isAuthenticated();
 ?>
 
 
@@ -130,13 +135,24 @@ $isActive = function(?string $expected) use ($action) {
                         </a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link <?= $isActive('login') ?>"
-                           href="index.php?action=login">
-                            <i class="bi bi-person-circle me-1"></i> Login
-                        </a>
-                    </li>
 
+                    <?php if (!$isLogged): ?>
+                        <!-- Si NON connecté : lien Login -->
+                        <li class="nav-item">
+                            <a class="nav-link <?= $isActive('login') ?>"
+                               href="index.php?action=login">
+                                <i class="bi bi-person-circle me-1"></i> Login
+                            </a>
+                        </li>
+                    <?php else: ?>
+                        <!-- Si connecté : lien Logout -->
+                        <li class="nav-item">
+                            <a class="nav-link <?= $isActive('logout') ?>"
+                               href="index.php?action=logout">
+                                <i class="bi bi-box-arrow-right me-1"></i> Logout
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -170,7 +186,7 @@ $isActive = function(?string $expected) use ($action) {
         ">
     <div class="container small" style="color:#d2d6ef;">
         © <?= date('Y') ?> — TP Mihoyo
-        <br><span style="opacity:0.6;">Projet créé avec passion et magie ✦</span>
+        <br><span style="opacity:0.6;">Projet créé avec passion et magie ✦ (et persévérance...)</span>
     </div>
 </footer>
 

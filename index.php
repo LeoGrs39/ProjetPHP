@@ -15,6 +15,9 @@ $loader->addNamespace('\Config', 'Config');
 $loader->addNamespace('\Services', 'Services');
 $loader->addNamespace('\Exceptions', '/Exceptions');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $router = new Router('action');
 

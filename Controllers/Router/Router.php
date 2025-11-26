@@ -3,12 +3,17 @@ namespace Controllers\Router;
 
 use Controllers\MainController;
 use Controllers\PersoController;
+use Controllers\AuthController;
 use Controllers\Router\Route\RouteIndex;
 use Controllers\Router\Route\RouteAddPerso;
 use Controllers\Router\Route\RouteAddElement;
 use Controllers\Router\Route\RouteLogs;
 use Controllers\Router\Route\RouteEditPerso;
 use Controllers\Router\Route\RouteDelPerso;
+use Controllers\Router\Route\RouteLogin;
+use Controllers\Router\Route\RouteLogout;
+use Controllers\Router\Route\RouteProtected;
+use Services\AuthService;
 
 class Router
 {
@@ -25,13 +30,13 @@ class Router
         $this->createRouteList();
     }
 
-
     protected function createControllerList(): void
     {
         $templates = new \League\Plates\Engine(dirname(__DIR__, 2) . '/Views');
 
         $this->ctrlList['main']  = new MainController($templates);
         $this->ctrlList['perso'] = new PersoController($templates);
+        $this->ctrlList['auth']  = new AuthController($templates);
     }
 
     protected function createRouteList(): void
@@ -41,9 +46,12 @@ class Router
         $this->routeList['add-perso-element'] = new RouteAddElement('add-perso-element', $this->ctrlList['perso']);
         $this->routeList['logs']              = new RouteLogs('logs', $this->ctrlList['main']);
 
-        // actions sans vue dédiée
         $this->routeList['edit-perso']        = new RouteEditPerso('edit-perso', $this->ctrlList['perso']);
         $this->routeList['del-perso']         = new RouteDelPerso('del-perso', $this->ctrlList['perso']);
+
+        $this->routeList['login']             = new RouteLogin('login', $this->ctrlList['auth']);
+        $this->routeList['logout']            = new RouteLogout('logout', $this->ctrlList['auth']);
+        $this->routeList['protected']         = new RouteProtected('protected', $this->ctrlList['auth']);
     }
 
     public function routing(array $get, array $post): void
@@ -51,6 +59,13 @@ class Router
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
         $action = $get[$this->action_key] ?? 'index';
+
+        $publicRoutes = ['login'];
+
+        if (!in_array($action, $publicRoutes, true) && !AuthService::isAuthenticated()) {
+            header('Location: index.php?action=login');
+            exit;
+        }
 
         $route = $this->routeList[$action] ?? $this->routeList['index'] ?? null;
 
